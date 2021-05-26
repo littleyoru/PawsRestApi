@@ -1,0 +1,27 @@
+{
+  "name": "pawsrestapi",
+  "version": "1.0.0",
+  "description": "RESTful API for my Paws app",
+  "main": "api.js",
+  "type": "module",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/littleyoru/PawsRestApi.git"
+  },
+  "keywords": [
+    "api",
+    "REST"
+  ],
+  "author": "Elena Ene",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/littleyoru/PawsRestApi/issues"
+  },
+  "homepage": "https://github.com/littleyoru/PawsRestApi#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
