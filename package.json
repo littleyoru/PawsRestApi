@@ -5,6 +5,7 @@
   "main": "api.js",
   "type": "module",
   "scripts": {
+    "start": "node api.js",
     "test": "test"
   },
   "repository": {
