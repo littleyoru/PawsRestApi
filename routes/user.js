@@ -1,10 +1,52 @@
 import express from 'express'
+import sql from 'mssql'
 
 const router = express.Router()
 
+const sqlConfig = {
+  user: 'sa',
+  password: 'M1racl3R0manc3.',
+  server: 'DESKTOP-HMVT74S\\SQLEXPRESS', // DESKTOP-HMVT74S\SQLEXPRESS, 127.0.0.1\\sql
+  database: 'Paws1',
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
+  },
+  options: {
+    //instanceName: 'SQLEXPRESS',
+    encrypt: true,
+    trustServerCertificate: true // change to false for production
+  }
+}
+
+const pool = new sql.ConnectionPool(sqlConfig)
+
 // Login user
 router.route('/login')
-  .post((req, res) => { res.end('login route') })
+  .post((req, res) => {
+    // test db connection
+    pool.connect(sqlConfig).then(() => {
+      console.log('here')
+      //return sql.query`SELECT * FROM Species`
+      return pool.query('SELECT * FROM Species')
+    }).then(result => {
+      console.dir(result)
+      console.log(result)
+      return pool.close()
+    }).catch(err => {
+      // error checks
+      console.log('error ', err)
+      return pool.close()
+    })
+    pool.on('error', err => {
+      // error handler
+      console.log('error handler ', err)
+      pool.close()
+    })
+
+    res.end('login route') 
+  })
 
 // Create user account
 router.route('/register')
