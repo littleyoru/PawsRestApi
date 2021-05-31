@@ -12,30 +12,35 @@ const sqlConfig = {
   },
   options: {
     //instanceName: 'SQLEXPRESS',
-    encrypt: true,
+    // encrypt: true,
     trustServerCertificate: true // change to false for production
   }
 }
 
-const dbConnect = (req, res, next) => { 
-  sql.connect(sqlConfig).then(() => {
-    return sql.query`SELECT * FROM Species`
-  }).then(result => {
-    console.dir(result)
-    next()
-  }).catch(err => {
-    // error checks
-    console.log('error ', err)
-    next(err)
-  })
-  next()
-}
+// const poolPromise = new sql.ConnectionPool(sqlConfig)
+// const poolConnect = () => {
+//   return poolPromise.connect()
+// }
+// const poolConnect = poolPromise.connect()
+  // .then(pool => {
+  //   console.log('Connected to database.')
+  //   console.log('pool ', pool)
+  //   return pool
+  // })
+  // .catch(err => {
+  //   console.log('Failed to connect to database! ', err)
+  //   next(err)
+  // })
 
-sql.on('error', err => {
-  // error handler
-  console.log('error handler ', err)
-})
+//   poolPromise.on('error', err => {
+//   // error handler
+//   console.log('error handler ', err)
+// })
 
-dbConnect()
+const poolConnect = new sql.ConnectionPool(sqlConfig).connect()
+  .then(pool => { return pool })
+  .catch(err => { console.log('error in connection to db ', err) })
 
-export default sql
+
+
+export default poolConnect

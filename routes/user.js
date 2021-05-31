@@ -1,50 +1,63 @@
 import express from 'express'
 import sql from 'mssql'
+// import poolPromise from '../sqlDatabase.js'
+import poolConnect from '../sqlDatabase.js'
 
 const router = express.Router()
 
-const sqlConfig = {
-  user: 'sa',
-  password: 'M1racl3R0manc3.',
-  server: 'DESKTOP-HMVT74S\\SQLEXPRESS', // DESKTOP-HMVT74S\SQLEXPRESS, 127.0.0.1\\sql
-  database: 'Paws1',
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
-  options: {
-    //instanceName: 'SQLEXPRESS',
-    encrypt: true,
-    trustServerCertificate: true // change to false for production
-  }
-}
+// test route
+router.route('/test')
+  .get((req, res, next) => {
+    // await poolConnect
+    // try {
+    //   // const request = poolPromise.request()
+    //   // const request = new sql.Request(poolPromise)
+    //   const result = await poolConnect.request()
+    //     // .input('input_parameter', sql.Int, req.query.input_parameter)
+    //     // .query('select * from mytable where id = @input_parameter')
+    //     .query('SELECT * FROM Species')
+    //   res.json(result.recordset)
+    // } catch (err) {
+    //   next(err)
+    //   res.status(500)
+    //   res.end(err.message)
+    // }
 
-const pool = new sql.ConnectionPool(sqlConfig)
+    poolConnect.then((pool) => {
+      return pool.request()
+        .query('SELECT * FROM Species')
+    }).then(result => {
+      console.log('result ', result)
+    }).catch(err => {
+      console.log('error is: ', err)
+    })
+
+    // test db connection
+    // pool.connect(sqlConfig).then(() => {
+    //   console.log('here')
+    //   //return sql.query`SELECT * FROM Species`
+    //   return pool.query('SELECT * FROM Species')
+    // }).then(result => {
+    //   console.dir(result)
+    //   console.log(result)
+    //   return pool.close()
+    // }).catch(err => {
+    //   // error checks
+    //   console.log('error ', err)
+    //   return pool.close()
+    // })
+    // pool.on('error', err => {
+    //   // error handler
+    //   console.log('error handler ', err)
+    //   pool.close()
+    // })
+
+    res.end('login route') 
+  })
 
 // Login user
 router.route('/login')
-  .post((req, res) => {
-    // test db connection
-    pool.connect(sqlConfig).then(() => {
-      console.log('here')
-      //return sql.query`SELECT * FROM Species`
-      return pool.query('SELECT * FROM Species')
-    }).then(result => {
-      console.dir(result)
-      console.log(result)
-      return pool.close()
-    }).catch(err => {
-      // error checks
-      console.log('error ', err)
-      return pool.close()
-    })
-    pool.on('error', err => {
-      // error handler
-      console.log('error handler ', err)
-      pool.close()
-    })
-
+  .post((req, res, next) => {
     res.end('login route') 
   })
 
