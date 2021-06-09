@@ -1,8 +1,8 @@
 import express from 'express'
 import sql from 'mssql'
-import crypto from 'crypto'
 import poolConnect from '../sqlDatabase.js'
 import { asyncMiddleware, verifyJWT } from '../utils/middleware.js'
+import { encryptPasword, checkPassword } from '../utils/encryption.js'
 import createAccessToken from '../utils/authentication.js'
 
 const router = express.Router()
@@ -66,11 +66,10 @@ router.route('/register')
 
     // TODO: check email is unique
 
-    // encryption
-    let salt = crypto.randomBytes(16).toString('hex')
-    let hash = crypto.createHmac('sha256', salt).update(parsedBody.password).digest('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    // encryption password
+    const { salt, encryptedPass } = encryptPasword(parsedBody.password)
     parsedBody.salt = salt
-    parsedBody.password = hash
+    parsedBody.password = encryptedPass
 
     // save to database
     let createUserQuery = `INSERT INTO UserAccount (FullName, Email, UserPassword, Salt) VALUES ('${parsedBody.name}', '${parsedBody.email}', '${parsedBody.password}', '${parsedBody.salt}')`;
@@ -81,52 +80,56 @@ router.route('/register')
       let getUserQuery = `SELECT * FROM UserAccount WHERE Email='${parsedBody.email}'`;
       const getUser = await pool.request().query(getUserQuery)
       console.log('getUser result ', getUser)
-      let userId = getUser.recordset[0].Id
-      console.log('current user id ', userId)
-      // create access token for user
-      const { token, tokenExpiryDate } = createAccessToken(userId)
-      console.log('tokenExpiryDate ', tokenExpiryDate)
-      let saveTokenQuery = `INSERT INTO UserToken (Token, Usage, UserId) VALUES ('${token}', '${1}', '${userId}')`
-      const saveToken = await pool.request().query(saveTokenQuery)
-      console.log('save token ', saveToken)
-      console.log('token ', token)
-      return token
-    }).then(token => {
-      console.log('token result ', token)
-      res.header('authorization', token).json({ error: null, data: { token } })
-      // res.json(req.body)
-      // console.log('res after sending ', res)
+      let user = getUser.recordset[0]
+      return user
+    }).then(user => {
+      console.log('user result ', user)
+      res.json({ error: null, data: 'Account created successfully' })
     }).catch(err => {
       console.log('error is: ', err)
+      next(err)
     })
-
-    // res.end('register route')
   }))
 
   // Login user
 router.route('/login')
-.post(verifyJWT, async (req, res, next) => {
+.post(asyncMiddleware(async (req, res, next) => {
+  let parsedBody = req.body
 
-  // poolConnect.then((pool) => {
-  //   return pool.request()
-  //     .query('SELECT * FROM Species')
-  // }).then(result => {
-  //   console.log('result ', result)
-  // }).catch(err => {
-  //   console.log('error is: ', err)
-  // })
-  res.end('login route') 
-})
+  poolConnect.then(async (pool) => {
+    const getUser = await pool.request().query(`SELECT * FROM UserAccount WHERE Email='${parsedBody.email}'`)
+    let user = getUser.recordset[0]
+
+    // check password
+    let encryptedPass = user.UserPassword
+    let salt = user.Salt
+    if (checkPassword(parsedBody.password, encryptedPass, salt) !== true) {
+      next(new Error('Wrong password').status(404))
+    }
+
+    // create access token for user
+    let userId = user.Id
+    const { token, tokenExpiryDate } = createAccessToken(userId)
+    console.log('tokenExpiryDate ', tokenExpiryDate)
+    let saveTokenQuery = `INSERT INTO UserToken (Token, TokenExpireDate, Usage, UserId) VALUES ('${token}', '${tokenExpiryDate}', '${1}', '${userId}')`
+    const saveToken = await pool.request().query(saveTokenQuery)
+    console.log('save token ', saveToken)
+    console.log('token ', token)
+    return token
+  }).then(token => {
+    console.log('token result ', token)
+    res.header('authorization', token).json({ error: null, data: { token } })
+  }).catch(err => {
+    console.log('error is: ', err)
+    next(err)
+  })
+}))
 
 // Get user account information
 router.route('/account/:userId')
-  .get((req, res) => { 
-    // const { authorization } = req.headers
-    // if (!authorization) throw new Error('You must send an Authorization header')
-    // const [authType, token] = authorization.trim().split(' ')
-    // if (authType !== 'Bearer') throw new Error('Expected a Bearer token')
+  .get(verifyJWT, asyncMiddleware(async (req, res, next) => { 
     res.end('get account route')
-  })
+  }))
 
 // Update user account information
 router.route('/account')
