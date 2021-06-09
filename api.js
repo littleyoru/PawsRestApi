@@ -1,5 +1,6 @@
 // import packages - using ES6 modules instead of CommonJS
 import express from 'express'
+import dotenv from 'dotenv'
 import sql from 'mssql'
 
 // routes
@@ -13,15 +14,16 @@ const app = express()
 
 // load JSON parser for bodies
 app.use(express.json())
+// app.use(express.urlencoded({ extended: false }))
 
 // set port 3000 as default if it is not specified in env
-app.set('port', process.env.PORT || 3000)
+app.set('port', process.env.PORT || 3002)
 
 // middleware
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   res.setHeader('Access-Control-Allow-Credentials', false)
   next()
 })
@@ -100,6 +102,6 @@ app.use(function(req, res, next) {
 // })
 
 
-app.listen(3000, () => {
-  console.log('RESTful API server running on http://localhost:3000')
+app.listen(3002, () => {
+  console.log('RESTful API server running on http://localhost:3002')
 })
