@@ -1,9 +1,9 @@
 import sql from 'mssql'
 
 const sqlConfig = {
-  user: 'sa',
-  password: 'M1racl3R0manc3.',
-  server: 'DESKTOP-HMVT74S\\SQLEXPRESS', // DESKTOP-HMVT74S\SQLEXPRESS, 127.0.0.1\\sql
+  user: `${process.env.DB_USER}`,
+  password: `${process.env.DB_PASS}`,
+  server: `${process.env.SERVER}`, // DESKTOP-HMVT74S\SQLEXPRESS, 127.0.0.1\\sql
   database: 'Paws1',
   pool: {
     max: 10,
