@@ -1,5 +1,7 @@
 // import packages - using ES6 modules instead of CommonJS
 import express from 'express'
+import dotenv from 'dotenv'
+import sql from 'mssql'
 
 // routes
 import index from './routes/index.js'
@@ -12,13 +14,49 @@ const app = express()
 
 // load JSON parser for bodies
 app.use(express.json())
+// app.use(express.urlencoded({ extended: false }))
 
 // set port 3000 as default if it is not specified in env
-app.set('port', process.env.PORT || 3000)
+app.set('port', process.env.PORT || 3002)
+
+// middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  res.setHeader('Access-Control-Allow-Credentials', false)
+  next()
+})
 
 // Load routes
 app.use('/', index)
 app.use('/user', user)
+
+// app.use('/test', (req, res) => {
+//   // test db connection
+//   sql.connect(sqlConfig).then(() => {
+//     console.log('here')
+//     //return sql.query`SELECT * FROM Species`
+//     return sql.query('SELECT * FROM Species')
+//   }).then(result => {
+//     // console.dir(result)
+//     console.log(result)
+//     sql.close()
+//     res.end('success response')
+//   }).catch(err => {
+//     // error checks
+//     console.log('error ', err)
+//     sql.close()
+//     res.end('error response')
+//   })
+//   sql.on('error', err => {
+//     // error handler
+//     console.log('error handler ', err)
+//   })
+
+//   res.end('response end')
+
+// })
 
 // Catch 404 and forwards to error handler
 app.use(function(req, res, next) {
@@ -64,6 +102,6 @@ app.use(function(req, res, next) {
 // })
 
 
-app.listen(3000, () => {
-  console.log('RESTful API server running on http://localhost:3000')
+app.listen(3002, () => {
+  console.log('RESTful API server running on http://localhost:3002')
 })
