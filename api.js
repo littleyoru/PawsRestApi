@@ -1,6 +1,8 @@
 // import packages - using ES6 modules instead of CommonJS
-import express from 'express'
+// require('dotenv').config()
 import dotenv from 'dotenv'
+dotenv.config()
+import express from 'express'
 import sql from 'mssql'
 
 // routes

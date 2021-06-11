@@ -1,9 +1,15 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import sql from 'mssql'
 
+let dbUser = `${process.env.DB_USER}`
+let dbPass = `${process.env.DB_PASS}`
+let dbServer = `${process.env.SERVER}`
+
 const sqlConfig = {
-  user: `${process.env.DB_USER}`,
-  password: `${process.env.DB_PASS}`,
-  server: `${process.env.SERVER}`, // DESKTOP-HMVT74S\SQLEXPRESS, 127.0.0.1\\sql
+  user: dbUser,
+  password: dbPass,
+  server: dbServer, //  127.0.0.1\\sql
   database: 'Paws1',
   pool: {
     max: 10,
