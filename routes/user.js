@@ -10,51 +10,15 @@ const router = express.Router()
 // test route
 router.route('/test')
   .get(asyncMiddleware(async (req, res, next) => {
-    // await poolConnect
-    // try {
-    //   // const request = poolPromise.request()
-    //   // const request = new sql.Request(poolPromise)
-    //   const result = await poolConnect.request()
-    //     // .input('input_parameter', sql.Int, req.query.input_parameter)
-    //     // .query('select * from mytable where id = @input_parameter')
-    //     .query('SELECT * FROM Species')
-    //   res.json(result.recordset)
-    // } catch (err) {
-    //   next(err)
-    //   res.status(500)
-    //   res.end(err.message)
-    // }
-
     poolConnect.then((pool) => {
       return pool.request()
         .query('SELECT * FROM Species')
     }).then(result => {
       console.log('result of query ', result)
+      res.end('test route') 
     }).catch(err => {
       console.log('error is: ', err)
     })
-
-    // test db connection
-    // pool.connect(sqlConfig).then(() => {
-    //   console.log('here')
-    //   //return sql.query`SELECT * FROM Species`
-    //   return pool.query('SELECT * FROM Species')
-    // }).then(result => {
-    //   console.dir(result)
-    //   console.log(result)
-    //   return pool.close()
-    // }).catch(err => {
-    //   // error checks
-    //   console.log('error ', err)
-    //   return pool.close()
-    // })
-    // pool.on('error', err => {
-    //   // error handler
-    //   console.log('error handler ', err)
-    //   pool.close()
-    // })
-
-    res.end('test route') 
   }))
 
 // Create user account
