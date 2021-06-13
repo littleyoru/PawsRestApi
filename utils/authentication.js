@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
 
 const createAccessToken = (userId) => {
   let jwtSecret = `${process.env.JWT_SECRET}`
