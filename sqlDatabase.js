@@ -43,10 +43,10 @@ const sqlConfig = {
 //   console.log('error handler ', err)
 // })
 
-const poolConnect = new sql.ConnectionPool(sqlConfig).connect()
+export const poolConnect = new sql.ConnectionPool(sqlConfig).connect()
   .then(pool => { return pool })
   .catch(err => { console.log('error in connection to db ', err) })
 
 
 
-export default poolConnect
+// export default poolConnect

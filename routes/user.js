@@ -1,5 +1,5 @@
 import express from 'express'
-import poolConnect from '../sqlDatabase.js'
+import { poolConnect } from '../sqlDatabase.js'
 import { asyncMiddleware, verifyJWT } from '../utils/middleware.js'
 import { encryptPasword, checkPassword } from '../utils/encryption.js'
 import createAccessToken from '../utils/authentication.js'
